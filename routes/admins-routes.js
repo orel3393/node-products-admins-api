@@ -1,7 +1,8 @@
 const router = require("express").Router();
-const fs = require("fs");
-const path = require("path");
-const bcrypt = require("bcrypt");
+const fs = require("fs")
+const path = require("path")
+// בונוס - ייבוא של ספריית bcrypt שמכילה פונקציות
+const bcrypt = require("bcrypt")
 
 const adminsPath = path.join(__dirname, "..", "data", "admins.json");
 
@@ -24,14 +25,14 @@ router.post("/", async (req, res) => {
     const admins = JSON.parse(fs.readFileSync(adminsPath));
     const newAdmin = req.body;
     if (!newAdmin.id || !newAdmin.name || !newAdmin.username || !newAdmin.password) {
-        return res.status(400).json({ error: "Missing required admin fields" });
+        return res.status(400).json({ error: "Not all required values were entered." });
     }
     if (admins.find(a => a.id === newAdmin.id) ||
         admins.find(a => a.username === newAdmin.username)) {
         return res.status(409).json({ error: "Admin already exists" });
     }
-    const hashedPassword = await bcrypt.hash(newAdmin.password, 10);
-    newAdmin.password = hashedPassword;
+    const hashedPassword = await bcrypt.hash(newAdmin.password, 10); // שומר בתוך משתנה סיסמה מוצפנת לסיסמה שהמשתמש נתן
+    newAdmin.password = hashedPassword; // שומר בקובץ את  הסיסמה המוצפנת
     admins.push(newAdmin);
     fs.writeFileSync(adminsPath, JSON.stringify(admins));
     res.status(201).json(newAdmin)
